@@ -12,8 +12,7 @@ src/main.cpp
 # Add executable target
 add_executable(Peril ${SOURCES} ${HEADERS})
 
+# Add raylib files and link to it
 target_include_directories(Peril PUBLIC src/include)
-
 target_link_directories(Peril PUBLIC lib)
-
 target_link_libraries(Peril PUBLIC raylib opengl32 gdi32 winmm user32 kernel32)
