@@ -6,7 +6,10 @@ project(Peril)
 
 # Add your source files here
 set(SOURCES
-src/main.cpp
+    src/main.cpp
+    src/config.cpp
+    src/include/common_main.h
+    src/include/states/config.h
 )
 
 # Add executable target
