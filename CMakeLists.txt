@@ -5,12 +5,20 @@ cmake_minimum_required(VERSION 3.12)
 project(Peril)
 
 # Add your source files here
+set (HEADERS 
+    src/include/common_main.h
+    src/include/state_manager.h
+    src/include/states/config.h
+    src/include/states/test_state.h
+)
+
 set(SOURCES
     src/main.cpp
     src/config.cpp
-    src/include/common_main.h
-    src/include/states/config.h
+    src/state_manager.cpp
+    src/test_state.cpp
 )
+
 
 # Add executable target
 add_executable(Peril ${SOURCES} ${HEADERS})

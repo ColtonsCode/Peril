@@ -4,87 +4,16 @@
 #include <string>
 #include <algorithm>
 
-#include <stack>
-
 #include <common_main.h>
-#include "states/config.h"
+#include <states/config.h>
+#include <states/test_state.h>
 
 void setupWindow();
 void DrawDebugText();
 
 // GLOBAL VARIABLES
 std::string g_resourcePath = "../../resources/";
-
-struct Player
-{
-    int x;
-    int y;
-    Texture2D texture;
-};
-
-struct TestState : GameState
-{
-    Player player;
-
-    TestState()
-    {
-
-        player.x = GetScreenWidth() / 2;
-        player.y = GetScreenHeight() / 2;
-        player.texture = LoadTexture((g_resourcePath + "placeholder_player.png").c_str());
-    }
-
-    void update()
-    {
-        if (IsKeyDown(KEY_W))
-        {
-            player.y -= 5;
-        }
-        if (IsKeyDown(KEY_S))
-        {
-            player.y += 5;
-        }
-        if (IsKeyDown(KEY_A))
-        {
-            player.x -= 5;
-        }
-        if (IsKeyDown(KEY_D))
-        {
-            player.x += 5;
-        }
-    }
-
-    void draw()
-    {
-        DrawTexture(player.texture, player.x - (player.texture.width / 2), player.y - (player.texture.height / 2), WHITE);
-    }
-};
-
-struct StateManager
-{
-
-    std::stack<GameState*> states;
-
-    void pushState(GameState* state)
-    {
-        states.push(state);
-    }
-
-    void popState()
-    {
-        states.pop();
-    }
-
-    void updateCurrentState()
-    {
-        states.top()->update();
-    }
-
-    void drawCurrentState()
-    {
-        states.top()->draw();
-    }
-}
+StateManager g_stateManager;
 
 int main() {
 
@@ -93,22 +22,21 @@ int main() {
     RenderTexture2D renderTarget = LoadRenderTexture(g_renderWidth, g_renderHeight);
     SetTextureFilter(renderTarget.texture, TEXTURE_FILTER_BILINEAR);
 
-    GameState* g_currentState = nullptr;
     // Starting state
     if (FileExists("config.txt"))
     {
-        g_currentState = new TestState();
+        g_stateManager.pushState(new TestState());
     }
     else
     {
-        g_currentState = new ConfigState();
+        g_stateManager.pushState(new ConfigState());
     }
 
     // Main loop
     while (!WindowShouldClose()) {
         float scale = std::min((float)GetScreenWidth()/g_renderWidth, (float)GetScreenHeight()/g_renderHeight);
 
-         // Update virtual mouse (clamped mouse value behind game screen)
+        // Update virtual mouse (clamped mouse value behind game screen)
         Vector2 mouse = GetMousePosition();
         Vector2 virtualMouse = { 0 };
         virtualMouse.x = (mouse.x - (GetScreenWidth() - (g_renderWidth*scale))*0.5f)/scale;
@@ -120,14 +48,14 @@ int main() {
         SetMouseScale(1/scale, 1/scale);
 
         // Update
-        g_currentState->update();
+        g_stateManager.updateCurrentState();
 
         BeginTextureMode(renderTarget);
         ClearBackground(BLACK);
         DrawDebugText();
 
         //Draw
-        g_currentState->draw();
+        g_stateManager.drawCurrentState();
         EndTextureMode();
 
         BeginDrawing();
